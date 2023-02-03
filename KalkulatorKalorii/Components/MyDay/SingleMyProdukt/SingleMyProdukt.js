@@ -1,18 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, Touchable, TouchableOpacity, View, ScrollView } from 'react-native';
+import { Button, StyleSheet, Text, Touchable, TouchableOpacity, View, ScrollView, AsyncStorage } from 'react-native';
 import { useEffect, useState } from 'react';
 
-export default function SingleMyProdukt() {
+export default function SingleMyProdukt(props) {
     const [hidden, setHidden] = useState(false);
-    const deleteThat = () => {
-        
+
+    const akceptDelete = () => {
+        props.deleteThat(props.id)
+        setHidden(false)
     }
   return (
             <View style={styles.viewContainer}>
                 <View style={styles.view1}>
                     <View style={styles.datas}>
-                        <Text style={styles.name}>Filet z Kurczaka</Text>
-                        <Text style={styles.size}>90</Text><Text style={styles.sizeUnit}>g</Text>
+                        <Text style={styles.name}>{props.name}</Text>
+                        <Text style={styles.size}>{props.size}</Text><Text style={styles.sizeUnit}>g</Text>
                     </View>
                     <TouchableOpacity style={styles.delete} onPress={() => {setHidden(true)}}>
                         <Text style={styles.deleteText}>usuń</Text>
@@ -22,7 +24,7 @@ export default function SingleMyProdukt() {
                 <View style={styles.askHidden}>
                     <Text>Czy na pewno chcesz usunąć?</Text>
                     <View style={styles.hiddenYesNo}>
-                    <TouchableOpacity style={styles.deleteYes} onPress={deleteThat}>
+                    <TouchableOpacity style={styles.deleteYes} onPress={akceptDelete}>
                         <Text style={styles.deleteText}>Tak</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.deleteNo} onPress={() => {setHidden(false)}}>
@@ -36,13 +38,13 @@ export default function SingleMyProdukt() {
                         <View style={styles.makroData}>
                             <Text style={styles.makroName}>Białko</Text>
                             <View style={styles.unitData}>
-                                <Text style={styles.unitValue}><Text style={{color:"#1e3799"}}>30</Text> </Text><Text>g</Text>
+                                <Text style={styles.unitValue}><Text style={{color:"#1e3799"}}>{props.protein}</Text> </Text><Text>g</Text>
                             </View>
                         </View>
                         <View style={styles.makroData}>
                             <Text style={styles.makroName}>Węglowodany</Text>
                             <View style={styles.unitData}>
-                                <Text style={styles.unitValue}><Text style={{color:"#27ae60"}}>123</Text> </Text><Text>g</Text>
+                                <Text style={styles.unitValue}><Text style={{color:"#27ae60"}}>{props.carbo}</Text> </Text><Text>g</Text>
                             </View>
                         </View>
                     </View>
@@ -50,13 +52,13 @@ export default function SingleMyProdukt() {
                     <View style={styles.makroData}>
                             <Text style={styles.makroName}>Tłuszcze</Text>
                             <View style={styles.unitData}>
-                                <Text style={styles.unitValue}><Text style={{color:"#e58e26"}}>12</Text> </Text><Text>g</Text>
+                                <Text style={styles.unitValue}><Text style={{color:"#e58e26"}}>{props.fats}</Text> </Text><Text>g</Text>
                             </View>
                         </View>
                         <View style={styles.makroData}>
                             <Text style={styles.makroName}>Energia</Text>
                             <View style={styles.unitData}>
-                                <Text style={styles.unitValue}><Text style={{color:"#e55039"}}>623</Text> </Text><Text>g</Text>
+                                <Text style={styles.unitValue}><Text style={{color:"#e55039"}}>{props.energy}</Text> </Text><Text>g</Text>
                             </View>
                         </View>
                     </View>

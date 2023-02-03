@@ -1,13 +1,57 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, Touchable, TouchableOpacity, View, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, Touchable, TouchableOpacity, View, TextInput, AsyncStorage } from 'react-native';
 import { useEffect, useState } from 'react';
 import { AntDesign, Ionicons} from '@expo/vector-icons';
+import useToday from '../../../hooks/useToday';
 
 export default function Product(props) {
     const [number, onChangeNumber] = useState('');
     const [hidden, setHidden] = useState(false);
-    const addProduktToDay =() => {
-        console.log("Dodano produkt")
+    const today = useToday()
+    const countMakro = async(thisId) => {
+      return({
+        name: props.name,
+        protein: await unitCount(props.protein),
+        fats: await unitCount(props.fats),
+        carbo:await unitCount(props.carbo),
+        energy: await unitCount(props.energy),
+        size: number,
+        date: today,
+        id: thisId
+      })
+    }
+    const unitCount = (unit) => {
+      return Math.round((unit/100)*number)
+    }
+    const addProduktToDay = async () => {
+
+      try{
+        let lastId = await AsyncStorage.getItem('LASTID');
+        let value = await AsyncStorage.getItem('TODAYPRODUCTS');
+        if(value===null){
+            const makroObj = await countMakro(1)
+            let produktJSON = await JSON.stringify([makroObj]);
+            let lastIdJSON = await JSON.stringify(1);
+            await AsyncStorage.setItem('TODAYPRODUCTS', produktJSON);
+            await AsyncStorage.setItem('LASTID', lastIdJSON);
+        }
+        else{
+            value = await JSON.parse(value);
+            lastId = await JSON.parse(lastId);
+            lastId = await lastId+1;
+            const makroObj = await countMakro(lastId)
+            let produktJSON = await JSON.stringify([...value, makroObj]);
+            let lastIdJSON = await JSON.stringify(lastId);
+            await AsyncStorage.setItem('TODAYPRODUCTS', produktJSON);
+            await AsyncStorage.setItem('LASTID', lastIdJSON);
+        }
+        value = await AsyncStorage.getItem('TODAYPRODUCTS');
+        value = await JSON.parse(value);
+        await console.log(value)
+      }
+      catch(err){
+        console.log(err)
+      }
     }
 
   return (
@@ -41,7 +85,7 @@ export default function Product(props) {
                         <View style={styles.makroData}>
                             <Text style={styles.makroName}>Energia</Text>
                             <View style={styles.unitData}>
-                                <Text style={styles.unitValue}><Text style={{color:"#e55039"}}>{props.energy}</Text> </Text><Text>g</Text>
+                                <Text style={styles.unitValue}><Text style={{color:"#e55039"}}>{props.energy}</Text> </Text><Text>kcal</Text>
                             </View>
                         </View>
                     </View>
@@ -61,7 +105,7 @@ export default function Product(props) {
 
                     <Text style={styles.addHiddenElementText}>/g</Text>
 
-                    <TouchableOpacity style={styles.buttonAdd} onPress={() => setAddProdukt(!addProduct)}>
+                    <TouchableOpacity style={styles.buttonAdd} onPress={() => addProduktToDay()}>
                         <Ionicons name="add" size={24} color="#f1f2f6"/>
                     </TouchableOpacity>
                 </View>

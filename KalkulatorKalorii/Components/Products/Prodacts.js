@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, Touchable, TouchableOpacity, View, ScrollView } from 'react-native';
+import { Button, StyleSheet, Text, Touchable, TouchableOpacity, View, ScrollView, AsyncStorage } from 'react-native';
 import { useEffect, useState } from 'react';
 import { AntDesign, Ionicons} from '@expo/vector-icons';
 import Product from './Product/Product';
+import useToday from '../../hooks/useToday';
 
 const willBeImported= [
   {
@@ -28,13 +29,34 @@ const willBeImported= [
   }
 ]
 export default function Produkts() {
-
+  const [willBeImported, setWillBeImported] = useState([]);
+  const [today] = useToday();
+  const [hidden, setHidden] = useState(false);
+  const getElements = async () => {
+    let value = await AsyncStorage.getItem('PRODUCTS');
+    if(value===null){
+      setHidden(true)
+    }
+    else{
+      setHidden(false)
+    }
+    value = await JSON.parse(value);
+    await setWillBeImported(value)
+  }
+  useEffect(()=> {
+    getElements();
+  
+  },[])
 
   return (
     <ScrollView style={styles.scrollView}>
+      {hidden?
+        <Text style={styles.title}>Nie masz jeszcze żadnych dodanych produktów</Text>
+      :
         <View style={styles.container}>
             {willBeImported.map(unit => <Product {...unit}/>)}
         </View>
+      }
     </ScrollView>
   );
 }
@@ -48,5 +70,14 @@ container:{
     flexDirection:"column",
     backgroundColor: "#f9faff",
     overflow:"scroll"
-}
+},
+title:{
+  marginHorizontal: 30,
+  marginTop:20,
+  alignItems:'center',
+  justifyContent: 'center',
+  fontSize:34,
+  fontWeight:'300',
+  textAlign:"center",
+},
 });

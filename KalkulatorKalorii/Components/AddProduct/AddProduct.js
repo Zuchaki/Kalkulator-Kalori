@@ -1,13 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, Touchable, TouchableOpacity, View, TextInput, ScrollView } from 'react-native';
+import { Button, StyleSheet, Text, Touchable, TouchableOpacity, View, TextInput, ScrollView, AsyncStorage } from 'react-native';
 import { useEffect, useState } from 'react';
 import { AntDesign, Ionicons} from '@expo/vector-icons';
-import {AsyncStorage} from 'react-native';
 
 export default function AddProduct(props) {
     const [number, onChangeNumber] = useState('');
     const [hidden, setHidden] = useState(false);
-    const [test, setTest] = useState("");
+    const [test, setTest] = useState("tes");
     const addProduktToDay =() => {
         console.log("Dodano produkt")
     }
@@ -18,33 +17,35 @@ export default function AddProduct(props) {
         carbo: 0,
         energy: 0
     })
+    const [temp, setTemp] = useState()
+
     const onChangeHandler = (value, stateElement) => {
         setProduct({...product, [stateElement]:value})
     }
 
     const addHandler = async () => {
-        /*try{
-            await AsyncStorage.setItem(
-                'TASKS',
-                'I like to save it.',
-            );
-        }
-        catch(err){
-
-        }*/
-
         try{
-          const value = await AsyncStorage.getItem('PRODUCTS');
-          if(value===null){
-            console.log("zrob cos")
+            let value = await AsyncStorage.getItem('PRODUCTS');
+            if(value===null){
+                produktJSON = await JSON.stringify([product]);
+                await AsyncStorage.setItem('PRODUCTS', produktJSON);
             }
+            else{
+                value = await JSON.parse(value);
+                produktJSON = await JSON.stringify([...value, product]);
+                await AsyncStorage.setItem('PRODUCTS', produktJSON);
+            }
+            value = await AsyncStorage.getItem('PRODUCTS');
+            value = await JSON.parse(value);
+            await console.log(value)
         }
         catch(err){
 
         }
+
 
     }
-
+    
   return (
     <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
